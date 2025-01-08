@@ -1,0 +1,5 @@
+*.sh
+euler*
+sh/
+results/
+models/
