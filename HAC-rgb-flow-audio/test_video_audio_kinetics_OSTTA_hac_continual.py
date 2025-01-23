@@ -201,6 +201,8 @@ if __name__ == '__main__':
     parser.add_argument('--use_kinetics_100', action='store_true')
     parser.add_argument('--use_scheduler', action='store_true')
     parser.add_argument("--max_iter", type=int, default=714)
+    parser.add_argument('--resume_file', type=str, default='/path/to/resume_file',
+                        help='resume_file')
     args = parser.parse_args()
 
     np.random.seed(args.seed)
@@ -249,7 +251,8 @@ if __name__ == '__main__':
     log_path = base_path + log_name + '.csv'
     print(log_path)
 
-    resume_file = base_path_model + log_name + '.pt'
+    #resume_file = base_path_model + log_name + '.pt'
+    resume_file = args.resume_file
     print("Resuming from ", resume_file)
     checkpoint = torch.load(resume_file)
     

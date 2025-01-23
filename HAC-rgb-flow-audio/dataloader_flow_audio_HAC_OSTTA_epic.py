@@ -78,21 +78,15 @@ class HACDOMAIN(torch.utils.data.Dataset):
         self.use_flow = use_flow
 
         for dom in domain:
-            if dom == 'animal':
-                prefix = 'ActorShift/'
-            elif dom == 'human':
-                prefix = 'kinetics600/'
-            else:
-                prefix = 'cartoon/'
-            #prefix = dom + '/'
-            with open(self.base_path + "HAC_Splits/HAC_%s_only_%s.csv" % (split, dom)) as f:
+            prefix = dom + '/'
+            with open("splits/HAC_%s_only_%s.csv" % (split, dom)) as f:
                 f_csv = csv.reader(f)
                 for i, row in enumerate(f_csv):
                     self.video_list.append(row[0])
                     self.prefix_list.append(prefix)
                     self.label_list.append(row[1])
 
-            with open(self.base_path + "HAC_Splits/HAC_train_only_%s.csv" % (dom)) as f:
+            with open("splits/HAC_train_only_%s.csv" % (dom)) as f:
                 f_csv = csv.reader(f)
                 for i, row in enumerate(f_csv):
                     self.video_list.append(row[0])
@@ -106,7 +100,7 @@ class HACDOMAIN(torch.utils.data.Dataset):
         splits = []
         for dom in ['D3']:
             for spl in ['train', 'test']:
-                train_file = pd.read_pickle(self.base_path_open + 'MM-SADA_Domain_Adaptation_Splits/'+dom+"_"+spl+".pkl")
+                train_file = pd.read_pickle('splits/'+dom+"_"+spl+".pkl")
 
                 for _, line in train_file.iterrows():
                     image = [dom + '/' + line['video_id'], line['start_frame'], line['stop_frame'], line['start_timestamp'],

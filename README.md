@@ -14,7 +14,7 @@
 
 <div>
     <h4 align="center">
-        • <a href="https://arxiv.org/abs/2407.01518" target='_blank'>arXiv 2025</a> •
+        • <a href="https://openreview.net/forum?id=hj323oR3rw" target='_blank'>ICLR 2025</a> •
     </h4>
 </div>
 
@@ -31,7 +31,7 @@
 
 Figure 1: (a) Tent minimizes the entropy of all samples, making it difficult to separate the prediction score distributions of known and unknown samples. (b) Our AEO amplifies entropy differences between known and unknown samples through adaptive optimization. (c) As a result, Tent negatively impacts MM-OSTTA performance while AEO significantly improves unknown class detection.
 
-## Code
+## Environment
 The code was tested using `Python 3.10.13`, `torch 2.3.1+cu121` and `NVIDIA GeForce RTX 3090`, more dependencies are in `requirement.txt`.
 
 Environments:
@@ -39,19 +39,11 @@ Environments:
 mmcv-full 1.2.7
 mmaction2 0.13.0
 ```
-### EPIC-Kitchens Dataset
-### Prepare
+## Prepare Dataset
 
-#### Download Pretrained Weights
-1. Download Audio model [link](http://www.robots.ox.ac.uk/~vgg/data/vggsound/models/H.pth.tar), rename it as `vggsound_avgpool.pth.tar` and place under the `EPIC-rgb-flow-audio/pretrained_models` directory
-   
-2. Download SlowFast model for RGB modality [link](https://download.openmmlab.com/mmaction/recognition/slowfast/slowfast_r101_8x8x1_256e_kinetics400_rgb/slowfast_r101_8x8x1_256e_kinetics400_rgb_20210218-0dd54025.pth) and place under the `EPIC-rgb-flow-audio/pretrained_models` directory
-   
-3. Download SlowOnly model for Flow modality [link](https://download.openmmlab.com/mmaction/recognition/slowonly/slowonly_r50_8x8x1_256e_kinetics400_flow/slowonly_r50_8x8x1_256e_kinetics400_flow_20200704-6b384243.pth) and place under the `EPIC-rgb-flow-audio/pretrained_models` directory
-
-#### Download EPIC-Kitchens Dataset
+### Download EPIC-Kitchens Dataset
 ```
-bash download_script.sh 
+bash utils/download_epic_script.sh  
 ```
 Download Audio files [EPIC-KITCHENS-audio.zip](https://huggingface.co/datasets/hdong51/Human-Animal-Cartoon/blob/main/EPIC-KITCHENS-audio.zip).
 
@@ -60,37 +52,20 @@ Unzip all files and the directory structure should be modified to match:
 <summary>Click for details...</summary>
 
 ```
-├── MM-SADA_Domain_Adaptation_Splits
 ├── rgb
-|   ├── train
+|   ├── test
 |   |   ├── D1
-|   |   |   ├── P08_01.wav
-|   |   |   ├── P08_01
+|   |   |   ├── P08_09.wav
+|   |   |   ├── P08_09
 |   |   |   |     ├── frame_0000000000.jpg
 |   |   |   |     ├── ...
-|   |   |   ├── P08_02.wav
-|   |   |   ├── P08_02
+|   |   |   ├── P08_10.wav
+|   |   |   ├── P08_10
 |   |   |   ├── ...
 |   |   ├── D2
 |   |   ├── D3
-|   ├── test
-|   |   ├── D1
-|   |   ├── D2
-|   |   ├── D3
-
 
 ├── flow
-|   ├── train
-|   |   ├── D1
-|   |   |   ├── P08_01 
-|   |   |   |   ├── u
-|   |   |   |   |   ├── frame_0000000000.jpg
-|   |   |   |   |   ├── ...
-|   |   |   |   ├── v
-|   |   |   ├── P08_02
-|   |   |   ├── ...
-|   |   ├── D2
-|   |   ├── D3
 |   ├── test
 |   |   ├── D1
 |   |   ├── D2
@@ -99,87 +74,7 @@ Unzip all files and the directory structure should be modified to match:
 
 </details>
 
-### Video and Audio
-<details>
-<summary>Click for details...</summary>
-
-```
-cd EPIC-rgb-flow-audio
-```
-```
-python train_video_flow_audio_EPIC_MOOSA.py --use_video --use_audio -s D2 D3 -t D1 --lr 1e-4 --bsz 16 --nepochs 5 --mask_ratio 0.7 --entropy_min_weight 0.001 --datapath /path/to/EPIC-KITCHENS/
-```
-```
-python train_video_flow_audio_EPIC_MOOSA.py --use_video --use_audio -s D1 D3 -t D2 --lr 1e-4 --bsz 16 --nepochs 10 --mask_ratio 0.7 --entropy_min_weight 1.0 --datapath /path/to/EPIC-KITCHENS/
-```
-```
-python train_video_flow_audio_EPIC_MOOSA.py --use_video --use_audio -s D1 D2 -t D3 --lr 1e-4 --bsz 16 --nepochs 20 --mask_ratio 0.7 --entropy_min_weight 0.001 --datapath /path/to/EPIC-KITCHENS/
-```
-
-</details>
-
-### Video and Flow
-<details>
-<summary>Click for details...</summary>
-
-```
-cd EPIC-rgb-flow-audio
-```
-```
-python train_video_flow_audio_EPIC_MOOSA.py --use_video --use_flow -s D2 D3 -t D1 --lr 1e-4 --bsz 16 --nepochs 15 --mask_ratio 0.7 --entropy_min_weight 0.001 --datapath /path/to/EPIC-KITCHENS/
-```
-```
-python train_video_flow_audio_EPIC_MOOSA.py --use_video --use_flow -s D1 D3 -t D2 --lr 1e-4 --bsz 16 --nepochs 20 --mask_ratio 0.7 --entropy_min_weight 1.0 --datapath /path/to/EPIC-KITCHENS/
-```
-```
-python train_video_flow_audio_EPIC_MOOSA.py --use_video --use_flow -s D1 D2 -t D3 --lr 1e-4 --bsz 16 --nepochs 15 --mask_ratio 0.7 --entropy_min_weight 0.001 --datapath /path/to/EPIC-KITCHENS/
-```
-
-</details>
-
-### Flow and Audio
-<details>
-<summary>Click for details...</summary>
-
-
-```
-cd EPIC-rgb-flow-audio
-```
-```
-python train_video_flow_audio_EPIC_MOOSA.py --use_flow --use_audio -s D2 D3 -t D1 --lr 1e-4 --bsz 16 --nepochs 25 --mask_ratio 0.3 --entropy_min_weight 0.001 --datapath /path/to/EPIC-KITCHENS/
-```
-```
-python train_video_flow_audio_EPIC_MOOSA.py --use_flow --use_audio -s D1 D3 -t D2 --lr 1e-4 --bsz 16 --nepochs 10 --mask_ratio 0.3 --entropy_min_weight 0.001 --datapath /path/to/EPIC-KITCHENS/
-```
-```
-python train_video_flow_audio_EPIC_MOOSA.py --use_flow --use_audio -s D1 D2 -t D3 --lr 1e-4 --bsz 16 --nepochs 10 --mask_ratio 0.3 --entropy_min_weight 0.001 --datapath /path/to/EPIC-KITCHENS/
-```
-
-</details>
-
-### Video and Flow and Audio
-<details>
-<summary>Click for details...</summary>
-
-
-```
-cd EPIC-rgb-flow-audio
-```
-```
-python train_video_flow_audio_EPIC_MOOSA.py --use_video --use_flow --use_audio -s D2 D3 -t D1 --lr 1e-4 --bsz 16 --nepochs 15 --mask_ratio 0.7 --entropy_min_weight 0.001 --jigsaw_num_splits 2 --datapath /path/to/EPIC-KITCHENS/
-```
-```
-python train_video_flow_audio_EPIC_MOOSA.py --use_video --use_flow --use_audio -s D1 D3 -t D2 --lr 1e-4 --bsz 16 --nepochs 20 --mask_ratio 0.7 --entropy_min_weight 0.1 --jigsaw_num_splits 2 --datapath /path/to/EPIC-KITCHENS/
-```
-```
-python train_video_flow_audio_EPIC_MOOSA.py --use_video --use_flow --use_audio -s D1 D2 -t D3 --lr 1e-4 --bsz 16 --nepochs 20 --mask_ratio 0.3 --entropy_min_weight 0.1 --jigsaw_num_splits 2  --datapath /path/to/EPIC-KITCHENS/
-```
-
-</details>
-
-
-
-### HAC Dataset
+### Download HAC Dataset
 This dataset can be downloaded at [link](https://huggingface.co/datasets/hdong51/Human-Animal-Cartoon/tree/main).
 
 Unzip all files and the directory structure should be modified to match:
@@ -215,7 +110,92 @@ HAC
 
 </details>
 
-Download the pretrained weights similar to EPIC-Kitchens Dataset and put under the `HAC-rgb-flow-audio/pretrained_models` directory.
+### Download Kinetics-600 Dataset
+Download Kinetics-600 video data by 
+```
+wget -i utils/filtered_k600_train_path.txt
+```
+Extract all files and get audio data from video data by
+```
+python utils/generate_audio_files.py
+```
+
+Unzip all files and the directory structure should be modified to match:
+<details>
+<summary>Click for details...</summary>
+
+
+```
+Kinetics-600
+├── video
+|   ├── building sandcastle
+|   |   ├── *.mp4
+|   |   ├── *.wav
+|   |── ...
+```
+
+</details>
+
+Create audio corruptions (change 'traffic' to 'crowd', 'rain', 'thunder', 'wind' to create different corruptions):
+```
+python utils/make_c_audio_hac.py --corruption 'traffic' --severity 5 --data_path '/path/to/HAC/audio' --save_path '/path/to/HAC/audio-C' --weather_path 'utils/weather_audios/'
+```
+```
+python utils/make_c_audio_kinetics.py --corruption 'traffic' --severity 5 --data_path '/path/to/Kinetics/audio' --save_path '/path/to/Kinetics/audio-C' --weather_path 'utils/weather_audios/'
+```
+
+Create video corruptions (change 'jpeg_compression' to 'gaussian_noise', 'defocus_blur', 'frost', 'brightness', 'pixelate' to create different corruptions):
+```
+python utils/make_c_video_hac.py --corruption 'jpeg_compression' --severity 5 --data_path /path/to/HAC/videos --save_path /path/to/HAC/video-C
+```
+```
+python utils/make_c_video_kinetics.py --corruption 'jpeg_compression' --severity 5 --data_path '/path/to/Kinetics/videos' --save_path '/path/to/Kinetics/video-C' 
+```
+
+## Run the code
+### EPIC-Kitchens Dataset
+
+### Video and Audio
+<details>
+<summary>Click for details...</summary>
+
+```
+cd EPIC-rgb-flow-audio
+```
+Download pretrained [model1](https://huggingface.co/hdong51/AEO/blob/main/EPIC_D1_TTA_video_audio_single_pred.pt), [model2](https://huggingface.co/hdong51/AEO/blob/main/EPIC_D2_TTA_video_audio_single_pred.pt), and [model3](https://huggingface.co/hdong51/AEO/blob/main/EPIC_D3_TTA_video_audio_single_pred.pt), and put under `models/` folder
+
+D1 → D2
+
+```
+python test_video_audio_EPIC_OSTTA_hac.py -s D1 -t D2 --num_workers 4 --lr 2e-5 --tanh_alpha 0.8 --online_adapt --a2d_ratio 0.1 --marginal_ent_wei 0.1 --bsz 32 --use_video --use_audio --use_single_pred --datapath /path/to/EPIC-KITCHENS/ --datapath_open '/path/to/HAC/' --resume_file 'models/EPIC_D1_TTA_video_audio_single_pred.pt' 
+```
+
+D1 → D3
+```
+python test_video_audio_EPIC_OSTTA_hac.py -s D1 -t D3 --num_workers 4 --lr 2e-5 --tanh_alpha 0.8 --online_adapt --a2d_ratio 0.1 --marginal_ent_wei 0.1 --bsz 32 --use_video --use_audio --use_single_pred --datapath /path/to/EPIC-KITCHENS/ --datapath_open '/path/to/HAC/' --resume_file 'models/EPIC_D1_TTA_video_audio_single_pred.pt'
+```
+D2 → D1
+```
+python test_video_audio_EPIC_OSTTA_hac.py -s D2 -t D1 --num_workers 4 --lr 2e-5 --tanh_alpha 0.8 --online_adapt --a2d_ratio 0.1 --marginal_ent_wei 0.1 --bsz 32 --use_video --use_audio --use_single_pred --datapath /path/to/EPIC-KITCHENS/ --datapath_open '/path/to/HAC/' --resume_file 'models/EPIC_D2_TTA_video_audio_single_pred.pt'
+```
+D2 → D3
+```
+python test_video_audio_EPIC_OSTTA_hac.py -s D2 -t D3 --num_workers 4 --lr 2e-5 --tanh_alpha 0.8 --online_adapt --a2d_ratio 0.1 --marginal_ent_wei 0.1 --bsz 32 --use_video --use_audio --use_single_pred --datapath /path/to/EPIC-KITCHENS/ --datapath_open '/path/to/HAC/' --resume_file 'models/EPIC_D2_TTA_video_audio_single_pred.pt'
+```
+D3 → D1
+```
+python test_video_audio_EPIC_OSTTA_hac.py -s D3 -t D1 --num_workers 4 --lr 2e-5 --tanh_alpha 0.8 --online_adapt --a2d_ratio 0.1 --marginal_ent_wei 0.1 --bsz 32 --use_video --use_audio --use_single_pred --datapath /path/to/EPIC-KITCHENS/ --datapath_open '/path/to/HAC/' --resume_file 'models/EPIC_D3_TTA_video_audio_single_pred.pt'
+```
+D3 → D2
+```
+python test_video_audio_EPIC_OSTTA_hac.py -s D3 -t D2 --num_workers 4 --lr 2e-5 --tanh_alpha 0.8 --online_adapt --a2d_ratio 0.1 --marginal_ent_wei 0.1 --bsz 32 --use_video --use_audio --use_single_pred --datapath /path/to/EPIC-KITCHENS/ --datapath_open '/path/to/HAC/' --resume_file 'models/EPIC_D3_TTA_video_audio_single_pred.pt'
+```
+
+</details>
+
+
+
+### HAC Dataset
 
 ### Video and Audio
 <details>
@@ -225,15 +205,34 @@ Download the pretrained weights similar to EPIC-Kitchens Dataset and put under t
 ```
 cd HAC-rgb-flow-audio
 ```
+Download pretrained [model1](https://huggingface.co/hdong51/AEO/blob/main/HAC_animal_TTA_video_audio_single_pred.pt), [model2](https://huggingface.co/hdong51/AEO/blob/main/HAC_cartoon_TTA_video_audio_single_pred.pt), and [model3](https://huggingface.co/hdong51/AEO/blob/main/HAC_human_TTA_video_audio_single_pred.pt), and put under `models/` folder
+
+H → A
 ```
-python train_video_flow_audio_HAC_MOOSA.py --use_video --use_audio -s 'animal' 'cartoon' -t 'human' --lr 1e-4 --bsz 16 --nepochs 5 --mask_ratio 0.3 --entropy_min_weight 0.001 --datapath /path/to/HAC/
+python test_video_audio_HAC_OSTTA_epic.py -s 'human' -t 'animal' --num_workers 10  --online_adapt --a2d_ratio 0.1 --tanh_alpha 0.8 --lr 2e-5 --marginal_ent_wei 0.1 --bsz 32 --use_video --use_audio --use_single_pred --datapath /path/to/HAC/ --datapath_open '/path/to/EPIC-KITCHENS/' --resume_file 'models/HAC_human_TTA_video_audio_single_pred.pt' 
 ```
+H → C
 ```
-python train_video_flow_audio_HAC_MOOSA.py --use_video --use_audio -s 'human' 'cartoon' -t 'animal' --lr 1e-4 --bsz 16  --nepochs 10 --mask_ratio 0.7 --entropy_min_weight 0.001 --datapath /path/to/HAC/
+python test_video_audio_HAC_OSTTA_epic.py -s 'human' -t 'cartoon' --num_workers 10  --online_adapt --a2d_ratio 0.1 --tanh_alpha 0.9 --lr 2e-5 --marginal_ent_wei 0.1 --bsz 32 --use_video --use_audio --use_single_pred --datapath /path/to/HAC/ --datapath_open '/path/to/EPIC-KITCHENS/' --resume_file 'models/HAC_human_TTA_video_audio_single_pred.pt'  
 ```
+A → H
 ```
-python train_video_flow_audio_HAC_MOOSA.py --use_video --use_audio -s 'human' 'animal' -t 'cartoon' --lr 1e-4 --bsz 16 --nepochs 10 --mask_ratio 0.3 --entropy_min_weight 0.001 --datapath /path/to/HAC/
+python test_video_audio_HAC_OSTTA_epic.py -s 'animal' -t 'human' --num_workers 10  --online_adapt --a2d_ratio 0.1 --tanh_alpha 0.9 --lr 2e-5 --marginal_ent_wei 0.1 --bsz 32 --use_video --use_audio --use_single_pred --datapath /path/to/HAC/ --datapath_open '/path/to/EPIC-KITCHENS/' --resume_file 'models/HAC_animal_TTA_video_audio_single_pred.pt'  
 ```
+A → C
+```
+python test_video_audio_HAC_OSTTA_epic.py -s 'animal' -t 'cartoon' --num_workers 10  --online_adapt --a2d_ratio 0.1 --tanh_alpha 0.9 --lr 2e-5 --marginal_ent_wei 0.1 --bsz 32 --use_video --use_audio --use_single_pred --datapath /path/to/HAC/ --datapath_open '/path/to/EPIC-KITCHENS/' --resume_file 'models/HAC_animal_TTA_video_audio_single_pred.pt'  
+```
+C → A
+```
+python test_video_audio_HAC_OSTTA_epic.py -s 'cartoon' -t 'animal' --num_workers 10  --online_adapt --a2d_ratio 0.1 --tanh_alpha 0.8 --lr 2e-5 --marginal_ent_wei 0.1 --bsz 32 --use_video --use_audio --use_single_pred --datapath /path/to/HAC/ --datapath_open '/path/to/EPIC-KITCHENS/' --resume_file 'models/HAC_cartoon_TTA_video_audio_single_pred.pt' 
+```
+C → H
+```
+python test_video_audio_HAC_OSTTA_epic.py -s 'cartoon' -t 'human' --num_workers 10  --online_adapt --a2d_ratio 0.1 --tanh_alpha 0.8 --lr 2e-5 --marginal_ent_wei 0.1 --bsz 32 --use_video --use_audio --use_single_pred --datapath /path/to/HAC/ --datapath_open '/path/to/EPIC-KITCHENS/' --resume_file 'models/HAC_cartoon_TTA_video_audio_single_pred.pt'   
+```
+
+
 
 </details>
 
@@ -245,14 +244,31 @@ python train_video_flow_audio_HAC_MOOSA.py --use_video --use_audio -s 'human' 'a
 ```
 cd HAC-rgb-flow-audio
 ```
+Download pretrained [model1](https://huggingface.co/hdong51/AEO/blob/main/HAC_animal_TTA_video_flow_single_pred.pt), [model2](https://huggingface.co/hdong51/AEO/blob/main/HAC_cartoon_TTA_video_flow_single_pred.pt), and [model3](https://huggingface.co/hdong51/AEO/blob/main/HAC_human_TTA_video_flow_single_pred.pt), and put under `models/` folder
+
+H → A
 ```
-python train_video_flow_audio_HAC_MOOSA.py --use_video --use_flow -s 'animal' 'cartoon' -t 'human' --lr 1e-4 --bsz 16 --nepochs 20 --mask_ratio 0.3 --entropy_min_weight 0.001 --datapath /path/to/HAC/
+python test_video_flow_HAC_OSTTA_epic.py -s 'human' -t 'animal' --num_workers 10 --nepochs 1 --online_adapt --a2d_ratio 1.0 --tanh_alpha 0.5 --lr 2e-5 --marginal_ent_wei 0.1 --bsz 32 --steps 1 --use_video --use_flow --use_single_pred --datapath /path/to/HAC/ --datapath_open '/path/to/EPIC-KITCHENS/' --resume_file 'models/HAC_human_TTA_video_flow_single_pred.pt'
 ```
+H → C
 ```
-python train_video_flow_audio_HAC_MOOSA.py --use_video --use_flow -s 'human' 'cartoon' -t 'animal' --lr 1e-4 --bsz 16 --nepochs 20 --mask_ratio 0.3 --entropy_min_weight 0.001 --datapath /path/to/HAC/
+python test_video_flow_HAC_OSTTA_epic.py -s 'human' -t 'cartoon' --num_workers 10 --nepochs 1 --online_adapt --a2d_ratio 1.0 --tanh_alpha 0.5 --lr 2e-5 --marginal_ent_wei 0.1 --bsz 32 --steps 1 --use_video --use_flow --use_single_pred --datapath /path/to/HAC/ --datapath_open '/path/to/EPIC-KITCHENS/' --resume_file 'models/HAC_human_TTA_video_flow_single_pred.pt'
 ```
+A → H
 ```
-python train_video_flow_audio_HAC_MOOSA.py --use_video --use_flow -s 'human' 'animal' -t 'cartoon' --lr 1e-4 --bsz 16 --nepochs 20 --mask_ratio 0.3 --entropy_min_weight 0.001 --datapath /path/to/HAC/
+python test_video_flow_HAC_OSTTA_epic.py -s 'animal' -t 'human' --num_workers 10 --nepochs 1 --online_adapt --a2d_ratio 1.0 --tanh_alpha 0.5 --lr 2e-5 --marginal_ent_wei 0.1 --bsz 32 --steps 1 --use_video --use_flow --use_single_pred --datapath /path/to/HAC/ --datapath_open '/path/to/EPIC-KITCHENS/' --resume_file 'models/HAC_animal_TTA_video_flow_single_pred.pt' 
+```
+A → C
+```
+python test_video_flow_HAC_OSTTA_epic.py -s 'animal' -t 'cartoon' --num_workers 10 --nepochs 1 --online_adapt --a2d_ratio 1.0 --tanh_alpha 0.5 --lr 2e-5 --marginal_ent_wei 0.1 --bsz 32 --steps 1 --use_video --use_flow --use_single_pred --datapath /path/to/HAC/ --datapath_open '/path/to/EPIC-KITCHENS/' --resume_file 'models/HAC_animal_TTA_video_flow_single_pred.pt' 
+```
+C → A
+```
+python test_video_flow_HAC_OSTTA_epic.py -s 'cartoon' -t 'animal' --num_workers 10 --nepochs 1 --online_adapt --a2d_ratio 1.0 --tanh_alpha 0.5 --lr 2e-5 --marginal_ent_wei 0.1 --bsz 32 --steps 1 --use_video --use_flow --use_single_pred --datapath /path/to/HAC/ --datapath_open '/path/to/EPIC-KITCHENS/' --resume_file 'models/HAC_cartoon_TTA_video_flow_single_pred.pt' 
+```
+C → H
+```
+python test_video_flow_HAC_OSTTA_epic.py -s 'cartoon' -t 'human' --num_workers 10 --nepochs 1 --online_adapt --a2d_ratio 1.0 --tanh_alpha 0.5 --lr 2e-5 --marginal_ent_wei 0.1 --bsz 32 --steps 1 --use_video --use_flow --use_single_pred --datapath /path/to/HAC/ --datapath_open '/path/to/EPIC-KITCHENS/' --resume_file 'models/HAC_cartoon_TTA_video_flow_single_pred.pt' 
 ```
 
 </details>
@@ -265,14 +281,31 @@ python train_video_flow_audio_HAC_MOOSA.py --use_video --use_flow -s 'human' 'an
 ```
 cd HAC-rgb-flow-audio
 ```
+Download pretrained [model1](https://huggingface.co/hdong51/AEO/blob/main/HAC_animal_TTA_flow_audio_single_pred.pt), [model2](https://huggingface.co/hdong51/AEO/blob/main/HAC_cartoon_TTA_flow_audio_single_pred.pt), and [model3](https://huggingface.co/hdong51/AEO/blob/main/HAC_human_TTA_flow_audio_single_pred.pt), and put under `models/` folder
+
+H → A
 ```
-python train_video_flow_audio_HAC_MOOSA.py --use_flow --use_audio -s 'animal' 'cartoon' -t 'human' --lr 1e-4 --bsz 16 --nepochs 10 --mask_ratio 0.3 --entropy_min_weight 0.001 --datapath /path/to/HAC/
+python test_flow_audio_HAC_OSTTA_epic.py -s 'human' -t 'animal' --num_workers 10 --nepochs 1 --online_adapt --a2d_ratio 0.1 --tanh_alpha 0.8 --lr 2e-5 --marginal_ent_wei 0.1 --bsz 32 --steps 1 --use_flow --use_audio --use_single_pred --datapath /path/to/HAC/ --datapath_open '/path/to/EPIC-KITCHENS/' --resume_file 'models/HAC_human_TTA_flow_audio_single_pred.pt'  
 ```
+H → C
 ```
-python train_video_flow_audio_HAC_MOOSA.py --use_flow --use_audio -s 'human' 'cartoon' -t 'animal' --lr 1e-4 --bsz 16 --nepochs 10 --mask_ratio 0.3 --entropy_min_weight 0.001 --datapath /path/to/HAC/
+python test_flow_audio_HAC_OSTTA_epic.py -s 'human' -t 'cartoon' --num_workers 10 --nepochs 1 --online_adapt --a2d_ratio 0.1 --tanh_alpha 0.8 --lr 2e-5 --marginal_ent_wei 0.1 --bsz 32 --steps 1 --use_flow --use_audio --use_single_pred --datapath /path/to/HAC/ --datapath_open '/path/to/EPIC-KITCHENS/' --resume_file 'models/HAC_human_TTA_flow_audio_single_pred.pt'    
 ```
+A → H
 ```
-python train_video_flow_audio_HAC_MOOSA.py --use_flow --use_audio -s 'human' 'animal' -t 'cartoon' --lr 1e-4 --bsz 16 --nepochs 10 --mask_ratio 0.7 --entropy_min_weight 0.001 --datapath /path/to/HAC/
+python test_flow_audio_HAC_OSTTA_epic.py -s 'animal' -t 'human' --num_workers 10 --nepochs 1 --online_adapt --a2d_ratio 0.1 --tanh_alpha 0.8 --lr 2e-5 --marginal_ent_wei 0.1 --bsz 32 --steps 1 --use_flow --use_audio --use_single_pred --datapath /path/to/HAC/ --datapath_open '/path/to/EPIC-KITCHENS/' --resume_file 'models/HAC_animal_TTA_flow_audio_single_pred.pt'    
+```
+A → C
+```
+python test_flow_audio_HAC_OSTTA_epic.py -s 'animal' -t 'cartoon' --num_workers 10 --nepochs 1 --online_adapt --a2d_ratio 0.1 --tanh_alpha 0.8 --lr 2e-5 --marginal_ent_wei 0.1 --bsz 32 --steps 1 --use_flow --use_audio --use_single_pred --datapath /path/to/HAC/ --datapath_open '/path/to/EPIC-KITCHENS/' --resume_file 'models/HAC_animal_TTA_flow_audio_single_pred.pt'    
+```
+C → A
+```
+python test_flow_audio_HAC_OSTTA_epic.py -s 'cartoon' -t 'animal' --num_workers 10 --nepochs 1 --online_adapt --a2d_ratio 0.1 --tanh_alpha 0.8 --lr 2e-5 --marginal_ent_wei 0.1 --bsz 32 --steps 1 --use_flow --use_audio --use_single_pred --datapath /path/to/HAC/ --datapath_open '/path/to/EPIC-KITCHENS/' --resume_file 'models/HAC_cartoon_TTA_flow_audio_single_pred.pt'    
+```
+C → H
+```
+python test_flow_audio_HAC_OSTTA_epic.py -s 'cartoon' -t 'human' --num_workers 10 --nepochs 1 --online_adapt --a2d_ratio 0.1 --tanh_alpha 0.8 --lr 2e-5 --marginal_ent_wei 0.1 --bsz 32 --steps 1 --use_flow --use_audio --use_single_pred --datapath /path/to/HAC/ --datapath_open '/path/to/EPIC-KITCHENS/' --resume_file 'models/HAC_cartoon_TTA_flow_audio_single_pred.pt'    
 ```
 
 </details>
@@ -285,83 +318,133 @@ python train_video_flow_audio_HAC_MOOSA.py --use_flow --use_audio -s 'human' 'an
 ```
 cd HAC-rgb-flow-audio
 ```
+Download pretrained [model1](https://huggingface.co/hdong51/AEO/blob/main/HAC_animal_TTA_video_flow_audio_single_pred.pt), [model2](https://huggingface.co/hdong51/AEO/blob/main/HAC_cartoon_TTA_video_flow_audio_single_pred.pt), and [model3](https://huggingface.co/hdong51/AEO/blob/main/HAC_human_TTA_video_flow_audio_single_pred.pt), and put under `models/` folder
+
+H → A
 ```
-python train_video_flow_audio_HAC_MOOSA.py --use_video --use_flow --use_audio -s 'animal' 'cartoon' -t 'human' --lr 1e-4 --bsz 16 --nepochs 10 --mask_ratio 0.7 --entropy_min_weight 0.001 --jigsaw_num_splits 2 --datapath /path/to/HAC/
+python test_video_flow_audio_HAC_OSTTA_epic.py -s 'human' -t 'animal' --num_workers 10 --nepochs 1 --online_adapt --a2d_ratio 0.1 --tanh_k 4.0 --tanh_alpha 0.7 --lr 2e-5 --marginal_ent_wei 0.1 --bsz 32 --steps 1 --use_video --use_flow --use_audio --use_single_pred --datapath /path/to/HAC/ --datapath_open '/path/to/EPIC-KITCHENS/' --resume_file 'models/HAC_human_TTA_video_flow_audio_single_pred.pt' 
 ```
+H → C
 ```
-python train_video_flow_audio_HAC_MOOSA.py --use_video --use_flow --use_audio -s 'human' 'cartoon' -t 'animal' --lr 1e-4 --bsz 16 --nepochs 10 --mask_ratio 0.7 --entropy_min_weight 0.001 --jigsaw_num_splits 2 --jigsaw_samples 64 --datapath /path/to/HAC/
+python test_video_flow_audio_HAC_OSTTA_epic.py -s 'human' -t 'cartoon' --num_workers 10 --nepochs 1 --online_adapt --a2d_ratio 0.1 --tanh_k 4.0 --tanh_alpha 0.7 --lr 2e-5 --marginal_ent_wei 0.1 --bsz 32 --steps 1 --use_video --use_flow --use_audio --use_single_pred --datapath /path/to/HAC/ --datapath_open '/path/to/EPIC-KITCHENS/' --resume_file 'models/HAC_human_TTA_video_flow_audio_single_pred.pt'   
 ```
+A → H
 ```
-python train_video_flow_audio_HAC_MOOSA.py --use_video --use_flow --use_audio -s 'human' 'animal' -t 'cartoon' --lr 1e-4 --bsz 16 --nepochs 20 --mask_ratio 0.7 --alpha_trans 0.5 --entropy_min_weight 0.001 --jigsaw_num_splits 2 --datapath /path/to/HAC/
+python test_video_flow_audio_HAC_OSTTA_epic.py -s 'animal' -t 'human' --num_workers 10 --nepochs 1 --online_adapt --a2d_ratio 0.1 --tanh_k 4.0 --tanh_alpha 0.7 --lr 2e-5 --marginal_ent_wei 0.1 --bsz 32 --steps 1 --use_video --use_flow --use_audio --use_single_pred --datapath /path/to/HAC/ --datapath_open '/path/to/EPIC-KITCHENS/' --resume_file 'models/HAC_animal_TTA_video_flow_audio_single_pred.pt'   
 ```
+A → C
+```
+python test_video_flow_audio_HAC_OSTTA_epic.py -s 'animal' -t 'cartoon' --num_workers 10 --nepochs 1 --online_adapt --a2d_ratio 0.1 --tanh_k 4.0 --tanh_alpha 0.7 --lr 2e-5 --marginal_ent_wei 0.1 --bsz 32 --steps 1 --use_video --use_flow --use_audio --use_single_pred --datapath /path/to/HAC/ --datapath_open '/path/to/EPIC-KITCHENS/' --resume_file 'models/HAC_animal_TTA_video_flow_audio_single_pred.pt'   
+```
+C → A
+```
+python test_video_flow_audio_HAC_OSTTA_epic.py -s 'cartoon' -t 'animal' --num_workers 10 --nepochs 1 --online_adapt --a2d_ratio 0.1 --tanh_k 4.0 --tanh_alpha 0.7 --lr 2e-5 --marginal_ent_wei 0.1 --bsz 32 --steps 1 --use_video --use_flow --use_audio --use_single_pred --datapath /path/to/HAC/ --datapath_open '/path/to/EPIC-KITCHENS/' --resume_file 'models/HAC_cartoon_TTA_video_flow_audio_single_pred.pt'   
+```
+C → H
+```
+python test_video_flow_audio_HAC_OSTTA_epic.py -s 'cartoon' -t 'human' --num_workers 10 --nepochs 1 --online_adapt --a2d_ratio 0.1 --tanh_k 4.0 --tanh_alpha 0.7 --lr 2e-5 --marginal_ent_wei 0.1 --bsz 32 --steps 1 --use_video --use_flow --use_audio --use_single_pred --datapath /path/to/HAC/ --datapath_open '/path/to/EPIC-KITCHENS/' --resume_file 'models/HAC_cartoon_TTA_video_flow_audio_single_pred.pt'   
+```
+
 
 </details>
 
-## Multimodal Open-Set Domain Adaptation
+### Kinetics Dataset
 ### Video and Audio
 <details>
 <summary>Click for details...</summary>
 
+
 ```
-cd EPIC-rgb-flow-audio
+cd HAC-rgb-flow-audio
 ```
+Download pretrained [model1](https://huggingface.co/hdong51/AEO/blob/main/Kinetics_100_video_audio_single_pred_3090.pt), and put under `models/` folder
+
+defocus_blur + wind
 ```
-python train_video_audio_EPIC_MOOSA_OSDA.py -s D1 D2 -t D2 --lr 1e-4 --bsz 16 --nepochs 10 --mask_ratio 0.3 --target_filter_thr 0.5 --datapath /path/to/EPIC-KITCHENS/
+python test_video_audio_kinetics_OSTTA_hac.py --num_workers 10 --nepochs 1 --use_kinetics_100 --online_adapt --a2d_ratio 0.1 --tanh_k 4.0 --tanh_alpha 0.8 --lr 2e-5 --audio_noise_type 'wind' --video_noise_type 'defocus_blur' --marginal_ent_wei 1.0 --bsz 32 --steps 1 --use_video --use_audio --use_single_pred --datapath /path/to/Kinetics/ --datapath_open '/path/to/HAC/' --resume_file 'models/Kinetics_100_video_audio_single_pred_3090.pt'    
 ```
+frost + traffic
 ```
-python train_video_audio_EPIC_MOOSA_OSDA.py -s D1 D3 -t D3 --lr 1e-4 --bsz 16 --nepochs 10 --mask_ratio 0.7 --target_filter_thr 0.5 --datapath /path/to/EPIC-KITCHENS/
+python test_video_audio_kinetics_OSTTA_hac.py --num_workers 10 --nepochs 1 --use_kinetics_100 --online_adapt --a2d_ratio 0.1 --tanh_k 4.0 --tanh_alpha 0.8 --lr 2e-5 --audio_noise_type 'traffic' --video_noise_type 'frost' --marginal_ent_wei 1.0 --bsz 32 --steps 1 --use_video --use_audio --use_single_pred --datapath /path/to/Kinetics/ --datapath_open '/path/to/HAC/' --resume_file 'models/Kinetics_100_video_audio_single_pred_3090.pt'  
 ```
+
+brightness + thunder
 ```
-python train_video_audio_EPIC_MOOSA_OSDA.py -s D2 D1 -t D1 --lr 1e-4 --bsz 16 --nepochs 15 --mask_ratio 0.7 --target_filter_thr 0.5 --datapath /path/to/EPIC-KITCHENS/
+python test_video_audio_kinetics_OSTTA_hac.py --num_workers 10 --nepochs 1 --use_kinetics_100 --online_adapt --a2d_ratio 0.1 --tanh_k 4.0 --tanh_alpha 0.8 --lr 2e-5 --audio_noise_type 'thunder' --video_noise_type 'brightness' --marginal_ent_wei 1.0 --bsz 32 --steps 1 --use_video --use_audio --use_single_pred --datapath /path/to/Kinetics/ --datapath_open '/path/to/HAC/' --resume_file 'models/Kinetics_100_video_audio_single_pred_3090.pt'  
 ```
+
+pixelate + rain
 ```
-python train_video_audio_EPIC_MOOSA_OSDA.py -s D2 D3 -t D3 --lr 1e-4 --bsz 16 --nepochs 15 --mask_ratio 0.7 --target_filter_thr 0.5 --datapath /path/to/EPIC-KITCHENS/
+python test_video_audio_kinetics_OSTTA_hac.py --num_workers 10 --nepochs 1 --use_kinetics_100 --online_adapt --a2d_ratio 0.1 --tanh_k 4.0 --tanh_alpha 0.8 --lr 2e-5 --audio_noise_type 'rain' --video_noise_type 'pixelate' --marginal_ent_wei 1.0 --bsz 32 --steps 1 --use_video --use_audio --use_single_pred --datapath /path/to/Kinetics/ --datapath_open '/path/to/HAC/' --resume_file 'models/Kinetics_100_video_audio_single_pred_3090.pt'  
 ```
+
+jpeg_compression + crowd
 ```
-python train_video_audio_EPIC_MOOSA_OSDA.py -s D3 D1 -t D1 --lr 1e-4 --bsz 16 --nepochs 20 --mask_ratio 0.7 --target_filter_thr 0.3 --datapath /path/to/EPIC-KITCHENS/
+python test_video_audio_kinetics_OSTTA_hac.py --num_workers 10 --nepochs 1 --use_kinetics_100 --online_adapt --a2d_ratio 0.1 --tanh_k 4.0 --tanh_alpha 0.8 --lr 2e-5 --audio_noise_type 'crowd' --video_noise_type 'jpeg_compression' --marginal_ent_wei 1.0 --bsz 32 --steps 1 --use_video --use_audio --use_single_pred --datapath /path/to/Kinetics/ --datapath_open '/path/to/HAC/' --resume_file 'models/Kinetics_100_video_audio_single_pred_3090.pt'  
 ```
+
+gaussian_noise + gaussian_noise
 ```
-python train_video_audio_EPIC_MOOSA_OSDA.py -s D3 D2 -t D2 --lr 1e-4 --bsz 16 --nepochs 15 --mask_ratio 0.7 --target_filter_thr 0.5 --datapath /path/to/EPIC-KITCHENS/
+python test_video_audio_kinetics_OSTTA_hac.py --num_workers 10 --nepochs 1 --use_kinetics_100 --online_adapt --a2d_ratio 0.0 --tanh_k 4.0 --tanh_alpha 0.9 --lr 2e-5 --audio_noise_type 'gaussian_noise' --video_noise_type 'gaussian_noise' --marginal_ent_wei 1.0 --bsz 32 --steps 1 --use_video --use_audio --use_single_pred --datapath /path/to/Kinetics/ --datapath_open '/path/to/HAC/' --resume_file 'models/Kinetics_100_video_audio_single_pred_3090.pt'  
 ```
 
 
 </details>
 
-
-## Multimodal Open-Partial Domain Generalization
-### Video and Audio
+## Continual Multimodal Open-set TTA on HAC
 <details>
 <summary>Click for details...</summary>
 
+
 ```
-cd EPIC-rgb-flow-audio
-```
-```
-python train_video_audio_EPIC_MOOSA_Open_Partial.py -s D2 D3 -t D1 --lr 1e-4 --bsz 16 --nepochs 15 --mask_ratio 0.7 --entropy_min_weight 1.0 --datapath /path/to/EPIC-KITCHENS/
-```
-```
-python train_video_audio_EPIC_MOOSA_Open_Partial.py -s D1 D3 -t D2 --lr 1e-4 --bsz 16 --nepochs 15 --mask_ratio 0.7 --entropy_min_weight 1.0 --datapath /path/to/EPIC-KITCHENS/
-```
-```
-python train_video_audio_EPIC_MOOSA_Open_Partial.py -s D1 D2 -t D3 --lr 1e-4 --bsz 16 --nepochs 15 --mask_ratio 0.3 --entropy_min_weight 1.0 --datapath /path/to/EPIC-KITCHENS/
+cd HAC-rgb-flow-audio
 ```
 
+H → A → C
+```
+python test_video_audio_HAC_OSTTA_epic_continual.py -s 'human' -t 'animal' -t2 'cartoon' --num_workers 10 --nepochs 1 --online_adapt --a2d_ratio 0.1 --tanh_alpha 0.7 --lr 2e-5 --marginal_ent_wei 0.1 --bsz 32 --steps 1 --use_video --use_audio --use_single_pred --datapath /path/to/HAC/ --datapath_open '/path/to/EPIC-KITCHENS/' --resume_file 'models/HAC_human_TTA_video_audio_single_pred.pt'  
+```
+A → C → H 
+```
+python test_video_audio_HAC_OSTTA_epic_continual.py -s 'animal' -t 'cartoon' -t2 'human' --num_workers 10 --nepochs 1 --online_adapt --a2d_ratio 0.1 --tanh_alpha 0.9 --lr 2e-5 --marginal_ent_wei 0.1 --bsz 32 --steps 1 --use_video --use_audio --use_single_pred --datapath /path/to/HAC/ --datapath_open '/path/to/EPIC-KITCHENS/' --resume_file 'models/HAC_animal_TTA_video_audio_single_pred.pt'  
+```
+C → H → A 
+```
+python test_video_audio_HAC_OSTTA_epic_continual.py -s 'cartoon' -t 'human' -t2 'animal' --num_workers 10 --nepochs 1 --online_adapt --a2d_ratio 0.1 --tanh_alpha 0.8 --lr 2e-5 --marginal_ent_wei 0.1 --bsz 32 --steps 1 --use_video --use_audio --use_single_pred --datapath /path/to/HAC/ --datapath_open '/path/to/EPIC-KITCHENS/' --resume_file 'models/HAC_cartoon_TTA_video_audio_single_pred.pt'  
+```
+</details>
+
+## Continual Multimodal Open-set TTA on Kinetics
+<details>
+<summary>Click for details...</summary>
+
+
+```
+cd HAC-rgb-flow-audio
+```
+
+```
+python test_video_audio_kinetics_OSTTA_hac_continual.py --num_workers 10 --nepochs 1 --use_scheduler --use_kinetics_100 --online_adapt --a2d_ratio 0.05 --tanh_alpha 0.9 --lr 2e-5 --marginal_ent_wei 1.0 --bsz 32 --steps 1 --appen '_3090_best_14' --use_video --use_audio --use_single_pred --datapath /path/to/Kinetics/ --datapath_open '/path/to/HAC/' --resume_file 'models/Kinetics_100_video_audio_single_pred_3090.pt'   
+```
 
 </details>
+
+
+
 
 ## Contact
 If you have any questions, please send an email to donghaospurs@gmail.com
 
 ## Citation
 
-If you find our work useful in your research please consider citing our [paper](https://arxiv.org/abs/2407.01518):
+If you find our work useful in your research please consider citing our [paper](https://openreview.net/forum?id=hj323oR3rw):
 
 ```
-@inproceedings{dong2024moosa,
-    title={Towards Multimodal Open-Set Domain Generalization and Adaptation through Self-supervision},
+@inproceedings{dong2025aeo,
+    title={Towards Robust Multimodal Open-set Test-time Adaptation via Adaptive Entropy-aware Optimization},
     author={Dong, Hao and Chatzi, Eleni and Fink, Olga},
-    booktitle={European Conference on Computer Vision},
-    year={2024}
+    booktitle={The Thirteenth International Conference on Learning Representations},
+    year={2025}
 }
 ```
 
@@ -371,8 +454,10 @@ If you find our work useful in your research please consider citing our [paper](
 
 [MultiOOD](https://github.com/donghao51/MultiOOD): Scaling Out-of-Distribution Detection for Multiple Modalities
 
+[MOOSA](https://github.com/donghao51/MOOSA): Towards Multimodal Open-Set Domain Generalization and Adaptation through Self-supervision
+
 
 
 ## Acknowledgement
 
-Many thanks to the excellent open-source projects [SimMMDG](https://github.com/donghao51/SimMMDG) and [DomainAdaptation](https://github.com/xiaobai1217/DomainAdaptation).
+The code is based on [SimMMDG](https://github.com/donghao51/SimMMDG).

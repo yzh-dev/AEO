@@ -78,7 +78,7 @@ class HACDOMAIN(torch.utils.data.Dataset):
         self.video_noise_type = video_noise_type
         self.use_kinetics_100 = use_kinetics_100
 
-        self.video_noise_types = ["defocus_blur", "frost", "brightness", "pixelate", "jpeg_compression", "gaussian_noise_5"]
+        self.video_noise_types = ["defocus_blur", "frost", "brightness", "pixelate", "jpeg_compression", "gaussian_noise"]
         self.audio_noise_types = ["wind", "traffic", "thunder", "rain", "crowd", "gaussian_noise"]
         self.use_random_noise = use_random_noise
 
@@ -90,21 +90,15 @@ class HACDOMAIN(torch.utils.data.Dataset):
         self.samples, self.labels = load_txt_file_kinetics(train_file_name)
 
         for dom in ['animal', 'cartoon']:
-            if dom == 'animal':
-                prefix = 'ActorShift/'
-            elif dom == 'human':
-                prefix = 'kinetics600/'
-            else:
-                prefix = 'cartoon/'
-            #prefix = dom + '/'
-            with open(self.base_path_open + "HAC_Splits/HAC_%s_only_%s.csv" % (split, dom)) as f:
+            prefix = dom + '/'
+            with open("splits/HAC_%s_only_%s.csv" % (split, dom)) as f:
                 f_csv = csv.reader(f)
                 for i, row in enumerate(f_csv):
                     self.video_list.append(row[0])
                     self.prefix_list.append(prefix)
                     self.label_list.append(row[1])
 
-            with open(self.base_path_open + "HAC_Splits/HAC_train_only_%s.csv" % (dom)) as f:
+            with open("splits/HAC_train_only_%s.csv" % (dom)) as f:
                 f_csv = csv.reader(f)
                 for i, row in enumerate(f_csv):
                     self.video_list.append(row[0])
@@ -141,10 +135,12 @@ class HACDOMAIN(torch.utils.data.Dataset):
         video_path = ''
 
         if self.video_noise_type == 'None':
-            video_file = self.base_path + 'Kinetics-600-train/' + self.samples[index]
+            # video_file = self.base_path + 'Kinetics-600-train/' + self.samples[index]
+            video_file = self.base_path + 'video/' + self.samples[index]
         else:
-            #video_file = '/cluster/scratch/hadong/OSTTA/Kinetics50-C/video-C/' + self.video_noise_type + '/' + self.samples[index]
-            video_file = '/cluster/work/ibk_chatzi/hao/dataset/OSTTA/Kinetics50-C/video-C/' + self.video_noise_type + '/' + self.samples[index]
+            #video_file = 'Kinetics50-C/video-C/' + self.video_noise_type + '/' + self.samples[index]
+            #video_file = 'Kinetics50-C/video-C/' + self.video_noise_type + '/' + self.samples[index]
+            video_file = self.base_path + '/video-C/' + self.video_noise_type + '/' + self.samples[index]
         vid = iio.imread(video_file, plugin="pyav")
 
         frame_num = vid.shape[0]
@@ -168,12 +164,12 @@ class HACDOMAIN(torch.utils.data.Dataset):
         if self.video_noise_type == 'None':
             video_file_open = self.base_path_open + self.prefix_list[index_open] +'videos/' + self.video_list[index_open]
         else:
-            #video_file_open = '/cluster/scratch/hadong/OSTTA/HAC-C/' + self.prefix_list[index_open] + 'video-C/' + self.video_noise_type + '/' + self.video_list[index_open]
+            #video_file_open = 'HAC-C/' + self.prefix_list[index_open] + 'video-C/' + self.video_noise_type + '/' + self.video_list[index_open]
             if self.use_random_noise:
                 random_noise = random.choice(self.video_noise_types)
-                video_file_open = '/cluster/work/ibk_chatzi/hao/dataset/OSTTA/HAC-C/' + self.prefix_list[index_open] + 'video-C/' + random_noise + '/' + self.video_list[index_open]
+                video_file_open = self.base_path_open + '/HAC-C/' + self.prefix_list[index_open] + 'video-C/' + random_noise + '/' + self.video_list[index_open]
             else:
-                video_file_open = '/cluster/work/ibk_chatzi/hao/dataset/OSTTA/HAC-C/' + self.prefix_list[index_open] + 'video-C/' + self.video_noise_type + '/' + self.video_list[index_open]
+                video_file_open = self.base_path_open + '/HAC-C/' + self.prefix_list[index_open] + 'video-C/' + self.video_noise_type + '/' + self.video_list[index_open]
         vid_open = iio.imread(video_file_open, plugin="pyav")
 
         frame_num = vid_open.shape[0]
@@ -207,14 +203,12 @@ class HACDOMAIN(torch.utils.data.Dataset):
             samples, samplerate = sf.read(audio_path)
             duration = len(samples) / samplerate
             noise_std = 0.38
-            # noise_std = 0.18
             # noise_std = [.08, .12, 0.18, 0.26, 0.38][intensity - 1]
-            # noise_std = 0.08
             noise = np.random.normal(0, noise_std, len(samples))
             samples = samples + noise
         else:
-            # audio_path = '/cluster/scratch/hadong/OSTTA/Kinetics50-C/audio-C/' + self.audio_noise_type + '/' + self.samples[index][:-4] + '.wav'
-            audio_path = '/cluster/work/ibk_chatzi/hao/dataset/OSTTA/Kinetics50-C/audio-C/' + self.audio_noise_type + '/' + self.samples[index][:-4] + '.wav'
+            # audio_path = 'Kinetics50-C/audio-C/' + self.audio_noise_type + '/' + self.samples[index][:-4] + '.wav'
+            audio_path = 'Kinetics50-C/audio-C/' + self.audio_noise_type + '/' + self.samples[index][:-4] + '.wav'
             samples, samplerate = sf.read(audio_path)
             samples = samples[:, 0]
             duration = len(samples) / samplerate
@@ -238,8 +232,8 @@ class HACDOMAIN(torch.utils.data.Dataset):
                 noise = np.random.normal(0, noise_std, len(samples))
                 samples = samples + noise
             else:
-                # audio_path_open = '/cluster/scratch/hadong/OSTTA/HAC-C/' + self.prefix_list[index_open] + 'audio-C/' + self.audio_noise_type + '/' + self.video_list[index_open][:-4] + '.wav'
-                audio_path_open = '/cluster/work/ibk_chatzi/hao/dataset/OSTTA/HAC-C/' + self.prefix_list[index_open] + 'audio-C/' + random_noise + '/' + self.video_list[index_open][:-4] + '.wav'
+                # audio_path_open = 'HAC-C/' + self.prefix_list[index_open] + 'audio-C/' + self.audio_noise_type + '/' + self.video_list[index_open][:-4] + '.wav'
+                audio_path_open = 'HAC-C/' + self.prefix_list[index_open] + 'audio-C/' + random_noise + '/' + self.video_list[index_open][:-4] + '.wav'
                 samples, samplerate = sf.read(audio_path_open)
                 samples = samples[:, 0]
                 duration = len(samples) / samplerate
@@ -257,8 +251,8 @@ class HACDOMAIN(torch.utils.data.Dataset):
                 noise = np.random.normal(0, noise_std, len(samples))
                 samples = samples + noise
             else:
-                # audio_path_open = '/cluster/scratch/hadong/OSTTA/HAC-C/' + self.prefix_list[index_open] + 'audio-C/' + self.audio_noise_type + '/' + self.video_list[index_open][:-4] + '.wav'
-                audio_path_open = '/cluster/work/ibk_chatzi/hao/dataset/OSTTA/HAC-C/' + self.prefix_list[index_open] + 'audio-C/' + self.audio_noise_type + '/' + self.video_list[index_open][:-4] + '.wav'
+                # audio_path_open = 'HAC-C/' + self.prefix_list[index_open] + 'audio-C/' + self.audio_noise_type + '/' + self.video_list[index_open][:-4] + '.wav'
+                audio_path_open = 'HAC-C/' + self.prefix_list[index_open] + 'audio-C/' + self.audio_noise_type + '/' + self.video_list[index_open][:-4] + '.wav'
                 samples, samplerate = sf.read(audio_path_open)
                 samples = samples[:, 0]
                 duration = len(samples) / samplerate
