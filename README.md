@@ -14,7 +14,7 @@
 
 <div>
     <h4 align="center">
-        • <a href="https://openreview.net/forum?id=hj323oR3rw" target='_blank'>ICLR 2025</a> •
+        • <a href="https://arxiv.org/abs/2501.13924" target='_blank'>ICLR 2025</a> •
     </h4>
 </div>
 
@@ -437,7 +437,7 @@ If you have any questions, please send an email to donghaospurs@gmail.com
 
 ## Citation
 
-If you find our work useful in your research please consider citing our [paper](https://openreview.net/forum?id=hj323oR3rw):
+If you find our work useful in your research please consider citing our [paper](https://arxiv.org/abs/2501.13924):
 
 ```
 @inproceedings{dong2025aeo,
