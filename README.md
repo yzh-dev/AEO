@@ -31,6 +31,8 @@
 
 Figure 1: (a) Tent minimizes the entropy of all samples, making it difficult to separate the prediction score distributions of known and unknown samples. (b) Our AEO amplifies entropy differences between known and unknown samples through adaptive optimization. (c) As a result, Tent negatively impacts MM-OSTTA performance while AEO significantly improves unknown class detection.
 
+**Update**: We have a new survey paper on [Multimodal Adaptation and Generalization](https://arxiv.org/abs/2501.18592)
+
 ## Environment
 The code was tested using `Python 3.10.13`, `torch 2.3.1+cu121` and `NVIDIA GeForce RTX 3090`, more dependencies are in `requirement.txt`.
 
@@ -455,6 +457,8 @@ If you find our work useful in your research please consider citing our [paper](
 [MultiOOD](https://github.com/donghao51/MultiOOD): Scaling Out-of-Distribution Detection for Multiple Modalities
 
 [MOOSA](https://github.com/donghao51/MOOSA): Towards Multimodal Open-Set Domain Generalization and Adaptation through Self-supervision
+
+[Survey](https://github.com/donghao51/Awesome-Multimodal-Adaptation): Advances in Multimodal Adaptation and Generalization: From Traditional Approaches to Foundation Models
 
 
 
