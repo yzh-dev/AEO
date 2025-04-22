@@ -1,0 +1,52 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "RunCurrentFile",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}/EPIC-rgb-flow-audio",
+        },
+        {
+            "name": "EPIC-rgb-flow-audio调试",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}/EPIC-rgb-flow-audio",
+            // 在EPIC的D1域上预训练，在EPIC的D2域上测试，同时处理EPIC已知类别和HAC新类别
+            // 模态：使用视频（RGB）和音频双模态
+            "args": [
+                "--use_video",
+                "--use_audio",
+                "--use_single_pred",//不进行多模态特征融合
+                "-s",
+                "D1",
+                "-t",
+                "D2",
+                "--num_workers",
+                "4",
+                "--lr",
+                "2e-5",
+                "--tanh_alpha",
+                "0.8",
+                "--online_adapt",//
+                "--a2d_ratio",
+                "0.1",
+                "--marginal_ent_wei",
+                "0.1",
+                "--bsz",
+                "16",
+                // "32",
+                "--datapath",
+                "D:/ML/Dataset/EPIC_KITCHENS/",
+                "--datapath_open",
+                "D:/ML/Dataset/HAC/",
+                "--resume_file",
+                "models/EPIC_D1_TTA_video_audio_single_pred.pt"
+            ]
+        }
+    ]
+}
